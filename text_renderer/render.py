@@ -18,6 +18,12 @@ from text_renderer.utils.math_utils import PerspectiveTransform
 from text_renderer.utils.bbox import BBox
 from text_renderer.utils.font_text import FontText
 from text_renderer.utils.types import FontColor, is_list
+from text_renderer.config import (
+    RenderCfg,
+    NormPerspectiveTransformCfg,
+    UniformPerspectiveTransformCfg
+
+)
 
 
 class Render:
@@ -50,6 +56,7 @@ class Render:
         try:
             if self._should_apply_layout():
                 img, text, cropped_bg, transformed_text_mask = self.gen_multi_corpus()
+                
             else:
                 img, text, cropped_bg, transformed_text_mask = self.gen_single_corpus()
 
@@ -108,6 +115,8 @@ class Render:
             )
 
         if self.cfg.perspective_transform is not None:
+            # 固定transformer
+            
             transformer = PerspectiveTransform(self.cfg.perspective_transform)
             # TODO: refactor this, now we must call get_transformed_size to call gen_warp_matrix
             _ = transformer.get_transformed_size(text_mask.size)

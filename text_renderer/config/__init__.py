@@ -100,12 +100,22 @@ class FixedTextColorCfg(TextColorCfg):
 
 
 @dataclass
+class FixedTextColorDefaultCfg(TextColorCfg):
+    # For generate effect/layout example
+    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+        alpha = 255
+        text_color = (255, 255, 255, alpha)
+
+        return text_color
+
+
+@dataclass
 class SimpleTextColorCfg(TextColorCfg):
     """
     Randomly use mean value of background image
     """
 
-    alpha: Tuple[int, int] = (110, 255)
+    alpha: Tuple[int, int] = (90, 255)
 
     def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
         np_img = np.array(bg_img)
@@ -115,6 +125,27 @@ class SimpleTextColorCfg(TextColorCfg):
         r = np.random.randint(0, int(mean * 0.7))
         g = np.random.randint(0, int(mean * 0.7))
         b = np.random.randint(0, int(mean * 0.7))
+        text_color = (r, g, b, alpha)
+
+        return text_color
+
+
+@dataclass
+class SimpleTextColorHeBrewCfg(TextColorCfg):
+    """
+    Randomly use mean value of background image
+    """
+
+    alpha: Tuple[int, int] = (236, 255)
+
+    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+        np_img = np.array(bg_img)
+        mean = np.mean(np_img)
+
+        alpha = np.random.randint(*self.alpha)
+        r = np.random.randint(0, int(mean * 0.2))
+        g = np.random.randint(0, int(mean * 0.2))
+        b = np.random.randint(0, int(mean * 0.2))
         text_color = (r, g, b, alpha)
 
         return text_color

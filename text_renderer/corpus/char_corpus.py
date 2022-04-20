@@ -1,3 +1,4 @@
+import imp
 import os
 from dataclasses import field, dataclass
 from pathlib import Path
@@ -9,7 +10,7 @@ from loguru import logger
 from text_renderer.utils.errors import PanicError
 
 from .corpus import Corpus, CorpusCfg
-
+import re
 
 @dataclass
 class CharCorpusCfg(CorpusCfg):
@@ -75,3 +76,48 @@ class CharCorpus(Corpus):
         start = np.random.randint(0, len(self.text) - length)
         word = self.text[start : start + length]
         return word
+
+
+class CharCorpusHeBrew(Corpus):
+    """
+    Randomly sampling a certain length of strings from the corpus
+    """
+
+    def __init__(
+        self, cfg: "CorpusCfg",
+    ):
+        super().__init__(cfg)
+
+        self.cfg: CharCorpusCfg
+        self.text = ""
+
+        if len(self.cfg.text_paths) == 0:
+            raise PanicError(f"text_paths must not contain path")
+
+        for p in self.cfg.text_paths:
+            if not os.path.exists(p):
+                raise PanicError(f"text_path not exists: {p}")
+
+            logger.info(f"load: {p}")
+            with open(p, "r", encoding="utf-8") as f:
+                self.text += "".join(f.readlines())
+
+        if self.cfg.chars_file is not None:
+            self.font_manager.update_font_support_chars(self.cfg.chars_file)
+
+        if self.cfg.filter_by_chars:
+            self.text = Corpus.filter_by_chars(self.text, self.cfg.chars_file)
+            if self.cfg.filter_font:
+                self.font_manager.filter_font_path(self.cfg.filter_font_min_support_chars)
+
+        if len(self.text) < self.cfg.length[1]:
+            raise PanicError("too few texts")
+
+    def get_text(self):
+        length = np.random.randint(*self.cfg.length)
+        start = np.random.randint(0, len(self.text) - length)
+        word = self.text[start : start + length]
+
+        # 过滤英文字符
+        word = re.sub('[a-zA-Z]', '1', word)
+        return word[::-1]

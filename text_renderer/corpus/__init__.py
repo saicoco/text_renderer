@@ -1,5 +1,5 @@
 from .corpus import Corpus, CorpusCfg
-from .char_corpus import CharCorpus, CharCorpusCfg
+from .char_corpus import CharCorpus, CharCorpusCfg, CharCorpusHeBrew
 from .enum_corpus import EnumCorpus, EnumCorpusCfg
 from .word_corpus import WordCorpus, WordCorpusCfg
 from .rand_corpus import RandCorpus, RandCorpusCfg
@@ -16,4 +16,5 @@ __all__ = [
     "WordCorpusCfg",
     "RandCorpus",
     "RandCorpusCfg",
+    "CharCorpusHeBrew"
 ]

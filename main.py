@@ -50,7 +50,7 @@ class DBWriterProcess(Process):
                         break
 
                     name = "{:09d}".format(exist_count + count)
-                    db.write(name, m["image"], m["label"])
+                    db.write(name, m["image"], m["label"][::-1]) # 针对hebrew需将文字翻转
                     count += 1
                     if count % log_period == 0:
                         logger.info(

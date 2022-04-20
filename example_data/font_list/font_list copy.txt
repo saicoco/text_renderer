@@ -1,0 +1,7 @@
+Heebo-Black.ttf
+Heebo-Bold.ttf
+Heebo-ExtraBold.ttf
+Heebo-Light.ttf
+Heebo-Medium.ttf
+Heebo-Regular.ttf
+Heebo-Thin.ttf
