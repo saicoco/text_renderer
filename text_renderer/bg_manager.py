@@ -17,11 +17,13 @@ class BgManager:
         self.bg_paths: List[str] = []
         self.bg_imgs: List[PILImage] = []
         self.pre_load = pre_load
-
+        self.curr_bg_name = ""
         for p in bg_dir.glob("**/*"):
             if p.suffix in IMAGE_EXTENSIONS:
                 if self._is_transparent_image(p):
-                    logger.warning(f"Ignore transparent background image, please convert is to JPEG: {p}")
+                    logger.warning(
+                        f"Ignore transparent background image, please convert is to JPEG: {p}"
+                    )
                     continue
                 self.bg_paths.append(str(p))
                 if pre_load:
@@ -38,11 +40,14 @@ class BgManager:
     def get_bg(self) -> PILImage:
         # TODO: add efficient data augmentation
         if self.pre_load:
+            index = random_choice(list(range(len(self.bg_imgs))))
+            self.curr_bg_name = self.bg_paths[index].split("/")[-1][:-4]
+            return self.bg_imgs[index]
             return random_choice(self.bg_imgs)
 
         bg_path = random_choice(self.bg_paths)
         pil_img = self._get_bg(bg_path)
-
+        self.curr_bg_name = bg_path.split("/")[-1][:-4]
         return pil_img
 
     def guard_bg_size(self, pil_img: PILImage, size: Tuple[int, int]) -> PILImage:
