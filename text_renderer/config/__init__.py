@@ -12,9 +12,90 @@ from PIL.Image import Image as PILImage
 from text_renderer.effect import Effects
 from text_renderer.layout import Layout
 from text_renderer.layout.same_line import SameLineLayout
+from text_renderer.config.color_constance import colors
 
 if typing.TYPE_CHECKING:
     from text_renderer.corpus import Corpus
+
+
+color_mapping = {
+    "white": [
+        "black",
+        "deeppink1",
+        "deeppink2",
+        "deeppink3",
+        "deeppink4",
+        "deepskyblue1",
+        "deepskyblue2",
+        "deepskyblue3",
+        "deepskyblue4",
+        "darkgreen",
+        "forestgreen",
+        "mediumvioletred",
+        "orangered1",
+        "orangered2",
+        "orangered3",
+        "orangered4",
+        "red1",
+        "red2",
+        "red3",
+        "red4",
+        "violetred",
+        "violetred1",
+        "violetred2",
+        "violetred3",
+        "violetred4",
+    ],
+    "green": [
+        "white",
+        "cadmiumorange",
+        "darkorange",
+        "orange",
+        "orange1",
+        "yellow1",
+        "yellow2",
+    ],
+    "yellow1": ["black", "red1"],
+    "red1": [
+        "white",
+        "purple",
+        "purple1",
+        "purple2",
+        "purple3",
+    ],
+    "lightskyblue": ["dodgerblue4"],
+    # black bg
+    "black": [
+        "white",
+        "orangered1",
+        "orangered2",
+        "orangered3",
+        "orangered4",
+        "lightyellow1",
+        "lightyellow2",
+        "lightyellow3",
+        "lightyellow4",
+    ],
+    "dodgerblue4": [
+        "white",
+        "orangered1",
+        "orangered2",
+        "orangered3",
+        "orangered4",
+        "lightyellow1",
+        "lightyellow2",
+        "lightyellow3",
+        "lightyellow4",
+    ],
+    "darkgray": [
+        "white",
+        "lightyellow1",
+        "lightyellow2",
+        "lightyellow3",
+        "lightyellow4",
+    ],
+    "red1": ["white"],
+}
 
 
 @dataclass
@@ -85,14 +166,14 @@ class TextColorCfg:
     """
 
     @abstractmethod
-    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+    def get_color(self, bg_img: PILImage, colorType=None) -> Tuple[int, int, int, int]:
         pass
 
 
 @dataclass
 class FixedTextColorCfg(TextColorCfg):
     # For generate effect/layout example
-    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+    def get_color(self, bg_img: PILImage, colorType=None) -> Tuple[int, int, int, int]:
         alpha = 255
         text_color = (255, 50, 0, alpha)
 
@@ -117,7 +198,7 @@ class SimpleTextColorCfg(TextColorCfg):
 
     alpha: Tuple[int, int] = (90, 255)
 
-    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+    def get_color(self, bg_img: PILImage, colorType=None) -> Tuple[int, int, int, int]:
         np_img = np.array(bg_img)
         mean = np.mean(np_img)
 
@@ -131,23 +212,33 @@ class SimpleTextColorCfg(TextColorCfg):
 
 
 @dataclass
-class SimpleTextColorHeBrewCfg(TextColorCfg):
+class AdaptiveTextColorCfg(TextColorCfg):
     """
     Randomly use mean value of background image
     """
 
-    alpha: Tuple[int, int] = (236, 255)
+    alpha: Tuple[int, int] = (110, 255)
 
-    def get_color(self, bg_img: PILImage) -> Tuple[int, int, int, int]:
+    def get_color(self, bg_img: PILImage, colorType=None) -> Tuple[int, int, int, int]:
         np_img = np.array(bg_img)
         mean = np.mean(np_img)
+        curr_colors = None
+        if colorType is not None:
+            curr_colors = color_mapping.get(colorType, None)
 
-        alpha = np.random.randint(*self.alpha)
-        r = np.random.randint(0, int(mean * 0.2))
-        g = np.random.randint(0, int(mean * 0.2))
-        b = np.random.randint(0, int(mean * 0.2))
-        text_color = (r, g, b, alpha)
+        if not curr_colors:
+            alpha = np.random.randint(*self.alpha)
+            r = np.random.randint(0, int(mean * 0.7))
+            g = np.random.randint(0, int(mean * 0.7))
+            b = np.random.randint(0, int(mean * 0.7))
+            text_color = (r, g, b, alpha)
+        else:
+            alpha = np.random.randint(*self.alpha)
 
+            curr_color = np.random.choice(curr_colors)
+            curr_rgb = colors[curr_color]
+            r, g, b = curr_rgb.red, curr_rgb.green, curr_rgb.blue
+            text_color = (r, g, b, alpha)
         return text_color
 
 
@@ -227,6 +318,7 @@ def get_cfg(config_file: str) -> List[GeneratorCfg]:
     Returns:
 
     """
+    print(f"config:{config_file}")
     module = import_module_from_file(config_file)
     cfgs = getattr(module, "configs", None)
     if cfgs is None:

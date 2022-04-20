@@ -48,7 +48,7 @@ class Render:
 
         if not is_list(self.corpus) and is_list(self.cfg.corpus_effects):
             raise PanicError("corpus_effects is list, corpus is not list")
-
+        
         self.bg_manager = BgManager(cfg.bg_dir, cfg.pre_load_bg_img)
 
     @retry
@@ -99,11 +99,15 @@ class Render:
 
         bg = self.bg_manager.get_bg()
         if self.cfg.text_color_cfg is not None:
-            text_color = self.cfg.text_color_cfg.get_color(bg)
+            text_color = self.cfg.text_color_cfg.get_color(
+                bg, colorType=self.bg_manager.curr_bg_name
+            )
 
         # corpus text_color has higher priority than RenderCfg.text_color_cfg
         if self.corpus.cfg.text_color_cfg is not None:
-            text_color = self.corpus.cfg.text_color_cfg.get_color(bg)
+            text_color = self.corpus.cfg.text_color_cfg.get_color(
+                bg, self.bg_manager.curr_bg_name
+            )
 
         text_mask = draw_text_on_bg(
             font_text, text_color, char_spacing=self.corpus.cfg.char_spacing

@@ -61,11 +61,14 @@ class Corpus:
     """
 
     def __init__(
-        self, cfg: "CorpusCfg",
+        self,
+        cfg: "CorpusCfg",
     ):
         self.cfg = cfg
         self.font_manager = FontManager(
-            cfg.font_dir, cfg.font_list_file, cfg.font_size,
+            cfg.font_dir,
+            cfg.font_list_file,
+            cfg.font_size,
         )
 
     @retry
@@ -130,6 +133,7 @@ class Corpus:
 
         # TODO: find a more efficient way
         filtered_chars = []
+        print(text)
         if isinstance(text, list):
             out = []
             for t in text:
