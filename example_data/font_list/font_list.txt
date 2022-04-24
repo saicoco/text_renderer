@@ -11,17 +11,12 @@ Cousine-Regular.ttf
 Heebo-Black.ttf
 Heebo-Bold.ttf
 Heebo-ExtraBold.ttf
-Heebo-Light.ttf
 Heebo-Medium.ttf
 Heebo-Regular.ttf
-Heebo-Thin.ttf
 IBMPlexSansHebrew-Bold.ttf
-IBMPlexSansHebrew-ExtraLight.ttf
-IBMPlexSansHebrew-Light.ttf
 IBMPlexSansHebrew-Medium.ttf
 IBMPlexSansHebrew-Regular.ttf
 IBMPlexSansHebrew-SemiBold.ttf
-IBMPlexSansHebrew-Thin.ttf
 Tinos-Bold.ttf
 Tinos-BoldItalic.ttf
 Tinos-Italic.ttf

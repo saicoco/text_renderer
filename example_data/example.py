@@ -22,7 +22,7 @@ CURRENT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 OUT_DIR = CURRENT_DIR / "output"
 EVAL_OUT_DIR = CURRENT_DIR / "output_EVAL"
 DATA_DIR = CURRENT_DIR
-BG_DIR = DATA_DIR / "bg" / "samplebg"
+BG_DIR = DATA_DIR / "bg" / "color_bg"
 CHAR_DIR = DATA_DIR / "char"
 FONT_DIR = DATA_DIR / "font"
 FONT_LIST_DIR = DATA_DIR / "font_list"
@@ -31,7 +31,7 @@ TEXT_DIR = DATA_DIR / "text"
 font_cfg = dict(
     font_dir=FONT_DIR,
     font_list_file=FONT_LIST_DIR / "font_list.txt",
-    font_size=(35, 38),
+    font_size=(80, 81),
 )
 
 perspective_transform = NormPerspectiveTransformCfg(20, 20, 1.5)
@@ -54,7 +54,7 @@ def base_cfg(
     name: str, corpus, corpus_effects=None, layout_effects=None, layout=None, gray=False
 ):
     return GeneratorCfg(
-        num_image=100000,
+        num_image=10,
         save_dir=OUT_DIR / name,
         render_cfg=RenderCfg(
             bg_dir=BG_DIR,
@@ -63,10 +63,9 @@ def base_cfg(
             layout_effects=layout_effects,
             layout=layout,
             corpus=corpus,
-            corpus_effects=corpus_effects
+            corpus_effects=corpus_effects,
         ),
     )
-
 
 
 def get_char_hebrew_corpus():
@@ -77,7 +76,7 @@ def get_char_hebrew_corpus():
             filter_by_chars=True,
             chars_file=CHAR_DIR / "hebrew.txt",
             length=(10, 25),
-            char_spacing=(-0.3, 1.3),
+            char_spacing=(0, 0.1),
             **font_cfg
         ),
     )
@@ -112,7 +111,6 @@ def hebrew_data():
 
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
     return cfg
-
 
 
 def get_hebrew_char_corpus():
@@ -159,8 +157,8 @@ def hebrew_data():
         corpus_effects=Effects(
             [
                 OneOf(lines_effects),
-                OneOf([DropoutRand(p=0.2), DropoutVertical(p=0.2)]),
-                Padding(p=1, w_ratio=[0.2, 0.21], h_ratio=[0.2, 0.5], center=True),
+                # OneOf([DropoutRand(p=0.2), DropoutVertical(p=0.2)]),
+                # Padding(p=1, w_ratio=[0.2, 0.21], h_ratio=[0.2, 0.5], center=True),
             ]
         ),
     )
@@ -170,8 +168,7 @@ def hebrew_data():
 
 def enum_data():
     return base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus.cfg.char_spacing = 0.5
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
@@ -181,8 +178,7 @@ def enum_data():
 def hebrew_data_compact_space():
 
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus.cfg.char_spacing = -0.3
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
@@ -192,8 +188,7 @@ def hebrew_data_compact_space():
 def hebrew_data_emboss():
 
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.height = 48
     cfg.render_cfg.corpus_effects = Effects(
@@ -206,13 +201,9 @@ def hebrew_data_emboss():
     return cfg
 
 
-
-
-
 def extra_text_line_layout():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.layout = ExtraTextLineLayout(bottom_prob=1.0)
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
@@ -221,19 +212,16 @@ def extra_text_line_layout():
 
 def same_line_layout_different_font_size():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.layout = SameLineLayout(h_spacing=(0.9, 0.91))
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
     return cfg
 
 
-
 def padding():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus_effects = Effects(
         Padding(p=1, w_ratio=[0.2, 0.21], h_ratio=[0.7, 0.71], center=True)
@@ -244,8 +232,7 @@ def padding():
 
 def dropout_rand():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus_effects = Effects(DropoutRand(p=1, dropout_p=(0.3, 0.5)))
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
@@ -254,8 +241,7 @@ def dropout_rand():
 
 def dropout_horizontal():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus_effects = Effects(
         DropoutHorizontal(p=1, num_line=2, thickness=3)
@@ -266,26 +252,24 @@ def dropout_horizontal():
 
 def dropout_vertical():
     cfg = base_cfg(
-        inspect.currentframe().f_code.co_name,
-        corpus=get_char_hebrew_corpus()
+        inspect.currentframe().f_code.co_name, corpus=get_char_hebrew_corpus()
     )
     cfg.render_cfg.corpus_effects = Effects(DropoutVertical(p=1, num_line=15))
     cfg.render_cfg.text_color_cfg = AdaptiveTextColorCfg()
     return cfg
 
 
-
 # fmt: off
 # The configuration file must have a configs variable
 configs = [
     hebrew_data(),
-    hebrew_data_compact_space(),
-    hebrew_data_emboss(),
-    extra_text_line_layout(),
-    same_line_layout_different_font_size(),
-    padding(),
-    dropout_horizontal(),
-    dropout_rand(),
-    dropout_vertical()
+    # hebrew_data_compact_space(),
+    # hebrew_data_emboss(),
+    # extra_text_line_layout(),
+    # same_line_layout_different_font_size(),
+    # padding(),
+    # dropout_horizontal(),
+    # dropout_rand(),
+    # dropout_vertical()
 ]
 # fmt: on

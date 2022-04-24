@@ -133,7 +133,6 @@ class Corpus:
 
         # TODO: find a more efficient way
         filtered_chars = []
-        print(text)
         if isinstance(text, list):
             out = []
             for t in text:
